@@ -2,28 +2,159 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Snake Game - Login</title>
+  <link rel="shortcut icon" href="./IMAGE/—Pngtree—green snake with green shield_15597490.png" type="image/x-icon">
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* Loader Screen */
+    #loader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 9999;
+      color: white;
+    }
+    #loader img {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 20px;
+      animation: pulse 1.5s infinite alternate;
+    }
+    #loader h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: lime;
+      text-shadow: 0 0 10px lime, 0 0 20px #0f0;
+    }
+    .snake-loader {
+      width: 120px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+    .snake {
+      width: 40px;
+      height: 10px;
+      background: lime;
+      border-radius: 10px;
+      position: absolute;
+      left: -40px;
+      animation: slide 2s linear infinite;
+    }
+    @keyframes slide {
+      from { left: -40px; }
+      to { left: 120px; }
+    }
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.1); }
+    }
+
+    /* Hide main content initially */
+    #main-content {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <div class="login-box">
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Enter Username">
-    <button onclick="login()">Start Game</button>
+
+  <!-- Loader Screen -->
+  <div id="loader">
+    <img src="./IMAGE/—Pngtree—green snake with green shield_15597490.png" alt="Snake Logo">
+    <h1>Loading Snake Game...</h1>
+    <div class="snake-loader">
+      <div class="snake"></div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="main-content">
+    <div class="background">
+      <!-- Navigation Bar -->
+      <nav class="navbar">
+        <div class="logo">
+          <img src="./IMAGE/—Pngtree—green snake with green shield_15597490.png" alt="Snake Game Logo">
+          <span>Bite or Die</span>
+        </div>
+        <button class="cta-btn" onclick="auth()">Get Started</button>
+      </nav>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero">
+      <!-- Particle Container (inside hero only) -->
+      <div class="particles-container"></div>
+
+      <div>
+        <div class="intro">
+          <img src="./IMAGE/image 1 (1).png" alt="" width="100" height="100">
+          <h1>Welcome to the Ultimate Snake Game!</h1>
+        </div>
+        <p>
+          Dive into the classic arcade fun with our modern twist on the timeless Snake game.
+          Challenge your reflexes and strategy as you navigate the snake to grow longer and avoid obstacles.
+        </p>
+      </div>
+    </div>
+
+    <!-- Cards Section -->
+    <div class="cards">
+      <div class="card">
+        <h3>🎮 How to Play</h3>
+        <p>Use the arrow keys to move the snake. Eat the red squares to grow longer. Avoid hitting the walls or yourself!</p>
+      </div>
+      <div class="card">
+        <h3>💡 Why This Game</h3>
+        <p>Snake is simple but addictive, training your focus, speed, and reflexes. It's fun for all ages!</p>
+      </div>
+      <div class="card">
+        <h3>⚡ Features</h3>
+        <p>Classic snake mechanics, live score tracking, smooth animations, and replay anytime. More upgrades coming soon!</p>
+      </div>
+    </div>
+
+    <!-- Play Button -->
+    <button class="play-btn" onclick="auth()">▶️ Play Now</button>
+
+    <!-- Footer -->
+    <footer>
+      © 2025 Snake Game. Built with ❤️ by You.
+    </footer>
   </div>
 
   <script>
-    function login() {
-      const username = document.getElementById("username").value.trim();
-      if (username === "") {
-        alert("Please enter a username");
-        return;
-      }
-      localStorage.setItem("currentUser", username);
-      if (!localStorage.getItem(username)) {
-        localStorage.setItem(username, JSON.stringify({ highScore: 0 }));
-      }
-      window.location.href = "game.html";
+    // Navigation button
+    function auth() {
+      window.location.href = "auth.html";
+    }
+
+    // Show loader, then display main content
+    setTimeout(() => {
+      document.getElementById("loader").style.display = "none";
+      document.getElementById("main-content").style.display = "block";
+    }, 5000);
+
+    // Particles only inside hero
+    const particlesContainer = document.querySelector(".particles-container");
+    for (let i = 0; i < 40; i++) {
+      const p = document.createElement("div");
+      p.className = "particle";
+      const size = Math.random() * 6 + 2;
+      p.style.width = size + "px";
+      p.style.height = size + "px";
+      p.style.left = Math.random() * 100 + "%";
+      p.style.animationDuration = 5 + Math.random() * 10 + "s";
+      p.style.animationDelay = Math.random() * 5 + "s";
+      particlesContainer.appendChild(p);
     }
   </script>
 </body>

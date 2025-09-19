@@ -1,17 +1,43 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+const box = 20;
 
-const box = 20; // Snake unit size
 let snake = [{ x: 9 * box, y: 10 * box }];
-let food = {
-  x: Math.floor(Math.random() * 19) * box,
-  y: Math.floor(Math.random() * 19) * box
-};
+let food = randomFood();
 let score = 0;
 let d;
+let game; 
 
+// Auth check
+const currentUser = localStorage.getItem("currentUser");
+if (!currentUser) {
+  window.location.href = "index.html"; // back to login/signup
+}
+
+// Load user data (store each user separately)
+let userData = JSON.parse(localStorage.getItem(currentUser)) || { highScore: 0 };
+
+// Welcome card
+document.getElementById("welcomeMessage").innerText =
+  "Welcome, " + (userData.name || currentUser) + " to Bite or Die 🎮";
+document.getElementById("highScore").innerText = userData.highScore || 0;
+
+// Close welcome card
+document.getElementById("closeWelcome").addEventListener("click", () => {
+  document.getElementById("welcomeCard").classList.add("hidden");
+  startGame();
+});
+
+// Random food position
+function randomFood() {
+  return {
+    x: Math.floor(Math.random() * 19) * box,
+    y: Math.floor(Math.random() * 19) * box
+  };
+}
+
+// Key control
 document.addEventListener("keydown", direction);
-
 function direction(event) {
   if (event.keyCode == 37 && d != "RIGHT") d = "LEFT";
   else if (event.keyCode == 38 && d != "DOWN") d = "UP";
@@ -19,6 +45,7 @@ function direction(event) {
   else if (event.keyCode == 40 && d != "UP") d = "DOWN";
 }
 
+// Game loop
 function draw() {
   ctx.clearRect(0, 0, 400, 400);
 
@@ -32,7 +59,7 @@ function draw() {
   ctx.fillStyle = "red";
   ctx.fillRect(food.x, food.y, box, box);
 
-  // Move snake
+  // Snake movement
   let snakeX = snake[0].x;
   let snakeY = snake[0].y;
 
@@ -41,20 +68,17 @@ function draw() {
   if (d == "RIGHT") snakeX += box;
   if (d == "DOWN") snakeY += box;
 
-  // Snake eats food
+  // Eating food
   if (snakeX == food.x && snakeY == food.y) {
     score++;
-    food = {
-      x: Math.floor(Math.random() * 19) * box,
-      y: Math.floor(Math.random() * 19) * box
-    };
+    food = randomFood();
   } else {
     snake.pop();
   }
 
   let newHead = { x: snakeX, y: snakeY };
 
-  // Game Over
+  // Game over
   if (
     snakeX < 0 ||
     snakeY < 0 ||
@@ -64,47 +88,52 @@ function draw() {
   ) {
     saveHighScore();
     clearInterval(game);
-    alert("Game Over! Final Score: " + score);
-    window.location.href = "index.html";
+    showGameOver();
+    return;
   }
 
   snake.unshift(newHead);
-
   document.getElementById("score").innerText = score;
 }
 
+// Collision check
 function collision(head, array) {
-  for (let i = 0; i < array.length; i++) {
-    if (head.x == array[i].x && head.y == array[i].y) {
-      return true;
-    }
-  }
-  return false;
+  return array.some(segment => head.x === segment.x && head.y === segment.y);
 }
 
+// Save high score
 function saveHighScore() {
-  const currentUser = localStorage.getItem("currentUser");
-  const userData = JSON.parse(localStorage.getItem(currentUser));
-  if (score > userData.highScore) {
+  if (score > (userData.highScore || 0)) {
     userData.highScore = score;
     localStorage.setItem(currentUser, JSON.stringify(userData));
   }
 }
 
+// Show game over card
+function showGameOver() {
+  document.getElementById("finalScore").innerText = score;
+  document.getElementById("finalHighScore").innerText = userData.highScore;
+  document.getElementById("gameOverCard").classList.remove("hidden");
+}
+
+// Continue button
+function continueGame() {
+  score = 0;
+  snake = [{ x: 9 * box, y: 10 * box }];
+  food = randomFood();
+  d = null;
+  document.getElementById("score").innerText = 0;
+  document.getElementById("gameOverCard").classList.add("hidden");
+  startGame();
+}
+
+// Logout
 function logout() {
   localStorage.removeItem("currentUser");
   window.location.href = "index.html";
 }
 
-// Load user
-const currentUser = localStorage.getItem("currentUser");
-if (!currentUser) {
-  window.location.href = "index.html";
+// Start game loop
+function startGame() {
+  game = setInterval(draw, 100);
 }
-document.getElementById("welcome").innerText = "Welcome, " + currentUser;
-const userData = JSON.parse(localStorage.getItem(currentUser));
-document.getElementById("highScore").innerText = userData.highScore;
-
-// Start game
-let game = setInterval(draw, 100);
-
